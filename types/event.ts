@@ -1,8 +1,10 @@
 export interface Event {
   id: string;
-  title: string;
-  date: string;
+  name: string;
+  date: Date;
   location: string;
   type: "indoor" | "outdoor";
-  createdAt: string;
+  status: "planning" | "in-progress" | "completed";
+  createdAt: Date;
+  updatedAt: Date;
 }
