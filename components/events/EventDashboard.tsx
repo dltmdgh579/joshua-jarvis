@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Event } from "@/types/event";
 import { supabase } from "@/lib/supabase";
+import { GameRecommendation } from "./GameRecommendation";
 
 export function EventDashboard({ eventId }: { eventId: string }) {
   const [event, setEvent] = useState<Event | null>(null);
@@ -33,10 +34,7 @@ export function EventDashboard({ eventId }: { eventId: string }) {
       </TabsList>
 
       <TabsContent value="games" className="mt-4">
-        <div className="p-4 border rounded-lg">
-          <h3 className="text-lg font-semibold mb-4">추천 게임</h3>
-          <p className="text-gray-500">아직 추천된 게임이 없습니다.</p>
-        </div>
+        {event && <GameRecommendation eventType={event.type} />}
       </TabsContent>
 
       <TabsContent value="schedule" className="mt-4">
