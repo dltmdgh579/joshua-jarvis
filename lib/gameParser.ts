@@ -26,7 +26,6 @@ export function parseGameFromMarkdown(markdown: string): ParsedGame[] {
     };
 
     const lines = block.split("\n");
-    let currentSection: "rules" | "materials" | null = null;
     let collectingRules = false;
 
     for (const line of lines) {

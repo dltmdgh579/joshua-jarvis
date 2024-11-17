@@ -84,3 +84,29 @@ export async function saveGame(game: Omit<Game, "id">) {
     return { success: false, error };
   }
 }
+
+export async function getGames() {
+  try {
+    const { data, error } = await supabase.from("games").select("*").order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    const formattedData = data?.map((game) => ({
+      id: game.id,
+      name: game.name,
+      category: game.category,
+      description: game.description,
+      minPlayers: game.min_players,
+      maxPlayers: game.max_players,
+      duration: game.duration,
+      location: game.location,
+      materials: game.materials,
+      rules: game.rules,
+    }));
+
+    return { success: true, data: formattedData };
+  } catch (error) {
+    console.error("Error fetching games:", error);
+    return { success: false, error };
+  }
+}

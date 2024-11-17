@@ -5,10 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "../ui/card
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { Game, GameCategory } from "@/types/game";
-import { getAIGameRecommendations, saveGame } from "@/app/actions/games";
+import { GameCategory } from "@/types/game";
+import { getAIGameRecommendations } from "@/app/actions/games";
 import ReactMarkdown from "react-markdown";
 import { SaveGameDialog } from "./SaveGameDialog";
+import { GameList } from "./GameList";
 
 interface GameRecommendationProps {
   eventType: "indoor" | "outdoor";
@@ -125,6 +126,8 @@ export function GameRecommendation({ eventType }: GameRecommendationProps) {
           </CardFooter>
         </Card>
       )}
+
+      <GameList />
     </div>
   );
 }
