@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { Suspense } from "react";
 import { getEvents } from "../actions/events";
+import { Event } from "@/types/event";
 
 // 로딩 컴포넌트
 function EventsSkeleton() {
@@ -23,7 +24,7 @@ function EventsSkeleton() {
 }
 
 // 이벤트 카드 컴포넌트
-function EventCard({ event }: { event: any }) {
+function EventCard({ event }: { event: Event }) {
   const statusColors = {
     planning: "bg-yellow-100 text-yellow-800",
     "in-progress": "bg-blue-100 text-blue-800",
