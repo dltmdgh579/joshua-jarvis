@@ -42,10 +42,11 @@ export function GameRecommendation({ eventType }: GameRecommendationProps) {
       if (result.success) {
         setRecommendations(result.recommendations || "");
       } else {
-        alert("게임 추천을 가져오는데 실패했습니다.");
+        alert(result.error || "게임 추천을 가져오는데 실패했습니다.");
       }
     } catch (error) {
       console.error("Error getting recommendations:", error);
+      alert("게임 추천 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
     }

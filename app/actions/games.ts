@@ -13,6 +13,10 @@ interface GameFilters {
 
 export async function getAIGameRecommendations(filters: GameFilters) {
   try {
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error("OpenAI API key is not configured");
+    }
+
     const prompt = `청년부 행사를 위한 게임을 추천해주세요.
 
 조건:
@@ -46,13 +50,28 @@ export async function getAIGameRecommendations(filters: GameFilters) {
       temperature: 0.7,
     });
 
+    if (!completion.choices[0].message.content) {
+      throw new Error("No response from OpenAI");
+    }
+
     return {
       success: true,
       recommendations: completion.choices[0].message.content,
     };
   } catch (error) {
     console.error("Error getting AI recommendations:", error);
-    return { success: false, error };
+
+    // 사용자에게 더 명확한 에러 메시지 제공
+    let errorMessage = "게임 추천을 가져오는데 실패했습니다.";
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    }
+
+    return {
+      success: false,
+      error: errorMessage,
+      recommendations: null,
+    };
   }
 }
 
