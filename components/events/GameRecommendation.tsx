@@ -118,8 +118,31 @@ export function GameRecommendation({ eventType }: GameRecommendationProps) {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="prose max-w-none">
-              <ReactMarkdown>{recommendations}</ReactMarkdown>
+            <div className="prose prose-slate max-w-none dark:prose-invert">
+              <ReactMarkdown
+                components={{
+                  h1: ({ children }) => <h1 className="text-2xl font-bold mb-4">{children}</h1>,
+                  h2: ({ children }) => <h2 className="text-xl font-bold mb-3">{children}</h2>,
+
+                  ul: ({ children }) => <ul className="list-disc pl-6 mb-4">{children}</ul>,
+                  ol: ({ children }) => <ol className="list-decimal pl-6 mb-4">{children}</ol>,
+
+                  p: ({ children }) => <p className="mb-4">{children}</p>,
+
+                  strong: ({ children }) => <strong className="font-bold">{children}</strong>,
+                  em: ({ children }) => <em className="italic">{children}</em>,
+
+                  hr: () => <hr className="my-4 border-t border-gray-200" />,
+
+                  a: ({ href, children }) => (
+                    <a href={href} className="text-blue-500 hover:underline">
+                      {children}
+                    </a>
+                  ),
+                }}
+              >
+                {recommendations}
+              </ReactMarkdown>
             </div>
           </CardContent>
           <CardFooter>
