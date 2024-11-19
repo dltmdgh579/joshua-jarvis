@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { Suspense } from "react";
 import { getEvents } from "../actions/events";
-import { Event } from "@/types/event";
+import { Event, EventType } from "@/types/event";
 
 // 로딩 컴포넌트
 function EventsSkeleton() {
@@ -37,6 +37,17 @@ function EventCard({ event }: { event: Event }) {
     completed: "완료",
   };
 
+  const getTypeLabel = (type: EventType) => {
+    const labels: Record<EventType, string> = {
+      worship: "예배",
+      fellowship: "친교",
+      education: "교육",
+      mission: "선교",
+      other: "기타",
+    };
+    return labels[type];
+  };
+
   return (
     <Link href={`/events/${event.id}`}>
       <Card className="hover:bg-gray-50 transition-colors cursor-pointer h-full">
@@ -58,7 +69,7 @@ function EventCard({ event }: { event: Event }) {
               <span className="font-medium">장소:</span> {event.location}
             </p>
             <p className="text-sm text-gray-600">
-              <span className="font-medium">유형:</span> {event.type === "indoor" ? "실내" : "야외"}
+              <span className="font-medium">유형:</span> {getTypeLabel(event.type)}
             </p>
             <span
               className={`inline-block px-2 py-1 text-sm rounded-full mt-2 ${

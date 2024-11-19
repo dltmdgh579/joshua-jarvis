@@ -79,7 +79,7 @@ export function SavedGames({ eventId }: SavedGamesProps) {
       } else {
         throw new Error("게임 등록 실패");
       }
-    } catch (error) {
+    } catch (err) {
       toast({
         title: "게임 등록 실패",
         description: "게임 등록 중 오류가 발생했습니다.",

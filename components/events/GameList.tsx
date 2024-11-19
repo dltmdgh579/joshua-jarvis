@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { getGames } from "@/app/actions/games";
 import { Game } from "@/types/game";
 import { Badge } from "../ui/badge";

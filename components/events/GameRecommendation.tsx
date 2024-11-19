@@ -9,7 +9,6 @@ import { GameCategory } from "@/types/game";
 import { getAIGameRecommendations } from "@/app/actions/games";
 import ReactMarkdown from "react-markdown";
 import { SaveGameDialog } from "./SaveGameDialog";
-import { GameList } from "./GameList";
 
 interface GameRecommendationProps {
   eventId: string;

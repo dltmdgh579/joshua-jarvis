@@ -6,8 +6,10 @@ export interface Event {
   name: string;
   date: Date;
   location: EventLocation;
-  type: string;
+  type: EventType;
   status: EventStatus;
   createdAt: Date;
   updatedAt: Date;
 }
+
+export type EventType = "worship" | "fellowship" | "education" | "mission" | "other";

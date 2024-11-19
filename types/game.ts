@@ -13,7 +13,7 @@ export interface Game {
   minPlayers: number;
   maxPlayers: number;
   duration: number; // 분 단위
-  location: "indoor" | "outdoor" | "both";
+  location: GameLocation;
   description: string;
   materials?: string[];
   rules: string[];

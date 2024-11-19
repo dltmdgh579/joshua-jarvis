@@ -34,7 +34,7 @@ export function EventDashboard({ eventId }: { eventId: string }) {
       </TabsList>
 
       <TabsContent value="games" className="mt-4">
-        {event && <GameRecommendation eventType={event.type} />}
+        {event && <GameRecommendation eventId={eventId} eventType={event.location} />}
       </TabsContent>
 
       <TabsContent value="schedule" className="mt-4">

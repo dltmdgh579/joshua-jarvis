@@ -49,7 +49,7 @@ export function RegisteredGames({ eventId, onGamesUpdate }: RegisteredGamesProps
 
   useEffect(() => {
     loadEventGames();
-  }, [eventId]);
+  }, [eventId, loadEventGames]);
 
   const handleUnregister = async (eventGameId: string) => {
     try {
@@ -65,7 +65,7 @@ export function RegisteredGames({ eventId, onGamesUpdate }: RegisteredGamesProps
       } else {
         throw new Error("게임 등록 해제 실패");
       }
-    } catch (error) {
+    } catch (err) {
       toast({
         title: "게임 등록 해제 실패",
         description: "게임 등록 해제 중 오류가 발생했습니다.",

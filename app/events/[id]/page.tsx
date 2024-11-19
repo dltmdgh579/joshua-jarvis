@@ -1,4 +1,3 @@
-import { EventDashboard } from "@/components/events/EventDashboard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GameTab } from "@/components/events/GameTab";
 import { EventHeader } from "@/components/events/EventHeader";
