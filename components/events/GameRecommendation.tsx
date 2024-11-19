@@ -12,10 +12,11 @@ import { SaveGameDialog } from "./SaveGameDialog";
 import { GameList } from "./GameList";
 
 interface GameRecommendationProps {
-  eventType: "indoor" | "outdoor";
+  eventId: string;
+  eventType: "indoor" | "outdoor" | "both";
 }
 
-export function GameRecommendation({ eventType }: GameRecommendationProps) {
+export function GameRecommendation({ eventId, eventType }: GameRecommendationProps) {
   const [filters, setFilters] = useState({
     category: "" as GameCategory | "",
     players: "",
@@ -150,8 +151,6 @@ export function GameRecommendation({ eventType }: GameRecommendationProps) {
           </CardFooter>
         </Card>
       )}
-
-      <GameList />
     </div>
   );
 }

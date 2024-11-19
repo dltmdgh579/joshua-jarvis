@@ -18,3 +18,5 @@ export interface Game {
   materials?: string[];
   rules: string[];
 }
+
+export type GameLocation = "indoor" | "outdoor" | "both";
