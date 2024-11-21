@@ -1,7 +1,7 @@
 "use client";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { GameRecommendation } from "./game/GameRecommendation";
+import { GameRecommendation } from "./GameRecommendation";
 import { SavedGames } from "./SavedGames";
 import { RegisteredGames } from "./RegisteredGames";
 import { Event } from "@/types/event";

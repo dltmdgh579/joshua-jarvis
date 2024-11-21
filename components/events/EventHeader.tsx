@@ -1,26 +1,15 @@
 "use client";
 
-import { useEvent } from "@/hooks/useEvent";
 import { Card, CardContent } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { CalendarIcon, MapPinIcon, TagIcon } from "lucide-react";
-import { EventLocation, EventStatus, EventType } from "@/types/event";
+import { Event, EventLocation, EventStatus, EventType } from "@/types/event";
 
 interface EventHeaderProps {
-  eventId: string;
+  event: Event;
 }
 
-export function EventHeader({ eventId }: EventHeaderProps) {
-  const { event, loading } = useEvent(eventId);
-
-  if (loading) {
-    return <div>행사 정보를 불러오는 중...</div>;
-  }
-
-  if (!event) {
-    return <div>행사 정보를 찾을 수 없습니다.</div>;
-  }
-
+export function EventHeader({ event }: EventHeaderProps) {
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat("ko-KR", {
       year: "numeric",

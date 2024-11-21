@@ -186,3 +186,24 @@ export async function unregisterGameFromEvent(eventId: string, eventGameId: stri
     return { success: false, error };
   }
 }
+
+export async function getEvent(eventId: string) {
+  try {
+    const { data, error } = await supabase.from("events").select("*").eq("id", eventId).single();
+
+    if (error) throw error;
+
+    return {
+      success: true,
+      data: {
+        ...data,
+        date: new Date(data.date),
+        createdAt: new Date(data.created_at),
+        updatedAt: new Date(data.updated_at),
+      } as Event,
+    };
+  } catch (error) {
+    console.error("Error fetching event:", error);
+    return { success: false, error };
+  }
+}

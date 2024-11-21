@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import { getGames } from "@/app/actions/games";
 import { Game } from "@/types/game";
-import { Badge } from "../ui/badge";
-import { Checkbox } from "../ui/checkbox";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion";
+import { Badge } from "../../ui/badge";
+import { Checkbox } from "../../ui/checkbox";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../../ui/accordion";
 
 interface GameListProps {
   selectable?: boolean;

@@ -1,21 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "../ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "../../ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../ui/select";
+import { Input } from "../../ui/input";
+import { Button } from "../../ui/button";
 import { GameCategory } from "@/types/game";
 import { getAIGameRecommendations } from "@/app/actions/games";
 import ReactMarkdown from "react-markdown";
 import { SaveGameDialog } from "./SaveGameDialog";
 
 interface GameRecommendationProps {
-  eventId: string;
   eventType: "indoor" | "outdoor" | "both";
 }
 
-export function GameRecommendation({ eventId, eventType }: GameRecommendationProps) {
+export function GameRecommendation({ eventType }: GameRecommendationProps) {
   const [filters, setFilters] = useState({
     category: "" as GameCategory | "",
     players: "",

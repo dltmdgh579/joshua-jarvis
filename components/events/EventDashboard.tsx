@@ -1,27 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Event } from "@/types/event";
-import { supabase } from "@/lib/supabase";
-import { GameRecommendation } from "./GameRecommendation";
+import { GameRecommendation } from "./game/GameRecommendation";
+import { useEvent } from "@/hooks/useEvent";
 
 export function EventDashboard({ eventId }: { eventId: string }) {
-  const [event, setEvent] = useState<Event | null>(null);
+  const { event, loading } = useEvent(eventId);
 
-  useEffect(() => {
-    const fetchEvent = async () => {
-      const { data } = await supabase.from("events").select("*").eq("id", eventId).single();
-      if (data) {
-        setEvent(data as Event);
-      }
-    };
-
-    fetchEvent();
-  }, [eventId]);
+  if (loading) {
+    return <div>로딩 중...</div>;
+  }
 
   if (!event) {
-    return <div>로딩 중...</div>;
+    return <div>행사 정보를 찾을 수 없습니다.</div>;
   }
 
   return (
@@ -34,7 +25,7 @@ export function EventDashboard({ eventId }: { eventId: string }) {
       </TabsList>
 
       <TabsContent value="games" className="mt-4">
-        {event && <GameRecommendation eventId={eventId} eventType={event.location} />}
+        <GameRecommendation eventType={event.location} />
       </TabsContent>
 
       <TabsContent value="schedule" className="mt-4">

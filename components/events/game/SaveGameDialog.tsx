@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
-import { Button } from "../ui/button";
-import { Input } from "../ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../../ui/dialog";
+import { Button } from "../../ui/button";
+import { Input } from "../../ui/input";
 import { Game, GameCategory } from "@/types/game";
 import { saveGame } from "@/app/actions/games";
-import { Textarea } from "../ui/textarea";
+import { Textarea } from "../../ui/textarea";
 import { parseGameFromMarkdown, convertToGame } from "@/lib/gameParser";
 
 interface SaveGameDialogProps {

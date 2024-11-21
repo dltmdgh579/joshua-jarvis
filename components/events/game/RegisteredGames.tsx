@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback } from "react";
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -39,17 +40,17 @@ export function RegisteredGames({ eventId, onGamesUpdate }: RegisteredGamesProps
   const [gameToUnregister, setGameToUnregister] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const loadEventGames = async () => {
+  const loadEventGames = useCallback(async () => {
     const result = await getEventGames(eventId);
     if (result.success && result.data) {
       setGames(result.data as unknown as EventGame[]);
     }
     setLoading(false);
-  };
+  }, [eventId]);
 
   useEffect(() => {
     loadEventGames();
-  }, [eventId, loadEventGames]);
+  }, [loadEventGames]);
 
   const handleUnregister = async (eventGameId: string) => {
     try {
