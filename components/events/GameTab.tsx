@@ -2,8 +2,8 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GameRecommendation } from "./game/GameRecommendation";
-import { SavedGames } from "./SavedGames";
-import { RegisteredGames } from "./RegisteredGames";
+import { SavedGames } from "./game/SavedGames";
+import { RegisteredGames } from "./game/RegisteredGames";
 import { Event } from "@/types/event";
 
 interface GameTabProps {
