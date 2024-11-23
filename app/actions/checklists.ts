@@ -2,6 +2,7 @@
 
 import { supabase } from "@/lib/supabase";
 import { Checklist, ChecklistItem } from "@/types/checklist";
+import { generateChecklist } from "@/lib/openai";
 
 export async function createChecklist(data: { eventId: string; title: string; dueDate: string }) {
   try {
@@ -44,20 +45,22 @@ export async function createChecklist(data: { eventId: string; title: string; du
   }
 }
 
-export async function createChecklistItem(data: { checklistId: string; title: string }) {
+export async function createChecklistItem(data: { checklistId: string; title: string; isAIRecommended?: boolean }) {
   try {
     const { data: item, error } = await supabase
       .from("checklist_items")
       .insert({
         checklist_id: data.checklistId,
         title: data.title,
-        is_completed: false,
+        is_ai_recommended: data.isAIRecommended || false,
       })
       .select(
         `
         id,
+        checklist_id,
         title,
         is_completed,
+        is_ai_recommended,
         created_at,
         updated_at
       `,
@@ -70,8 +73,10 @@ export async function createChecklistItem(data: { checklistId: string; title: st
       success: true,
       data: {
         id: item.id,
+        checklistId: item.checklist_id,
         title: item.title,
         isCompleted: item.is_completed,
+        isAIRecommended: item.is_ai_recommended,
         createdAt: new Date(item.created_at),
         updatedAt: new Date(item.updated_at),
       },
@@ -100,8 +105,13 @@ export async function getEventChecklists(eventId: string) {
           checklist_id,
           title,
           is_completed,
+          is_ai_recommended,
           created_at,
           updated_at
+        ),
+        event:events!inner (
+          name,
+          type
         )
       `,
       )
@@ -125,9 +135,14 @@ export async function getEventChecklists(eventId: string) {
           checklistId: item.checklist_id,
           title: item.title,
           isCompleted: item.is_completed,
+          isAIRecommended: item.is_ai_recommended,
           createdAt: new Date(item.created_at),
           updatedAt: new Date(item.updated_at),
         })),
+        event: {
+          title: checklist.event[0]?.name || "", // 배열의 첫 번째 항목 사용
+          type: checklist.event[0]?.type || "", // 배열의 첫 번째 항목 사용
+        },
       })),
     };
   } catch (error) {
@@ -255,6 +270,40 @@ export async function deleteChecklistItem(itemId: string) {
     return { success: true };
   } catch (error) {
     console.error("Error deleting checklist item:", error);
+    return { success: false, error };
+  }
+}
+
+export async function generateAIChecklist(
+  checklistId: string,
+  eventTitle: string,
+  checklistTitle: string,
+  count: number = 5,
+) {
+  try {
+    // 현재 체크리스트 항목들 가져오기
+    const { data: currentItems } = await supabase
+      .from("checklist_items")
+      .select("title")
+      .eq("checklist_id", checklistId);
+
+    const currentTitles = currentItems?.map((item) => item.title) || [];
+
+    // OpenAI API를 통해 체크리스트 아이템 생성
+    const recommendedItems = await generateChecklist(eventTitle, checklistTitle, currentTitles, count);
+
+    // 추천된 아이템들을 체크리스트에 추가
+    for (const title of recommendedItems) {
+      await createChecklistItem({
+        checklistId,
+        title,
+        isAIRecommended: true,
+      });
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error generating AI checklist:", error);
     return { success: false, error };
   }
 }

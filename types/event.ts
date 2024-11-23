@@ -11,5 +11,4 @@ export interface Event {
   createdAt: Date;
   updatedAt: Date;
 }
-
 export type EventType = "worship" | "fellowship" | "education" | "mission" | "other";

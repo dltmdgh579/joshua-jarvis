@@ -3,6 +3,7 @@ export interface ChecklistItem {
   checklistId: string;
   title: string;
   isCompleted: boolean;
+  isAIRecommended: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -16,4 +17,8 @@ export interface Checklist {
   items: ChecklistItem[];
   createdAt: Date;
   updatedAt: Date;
+  event?: {
+    title: string;
+    type: string;
+  };
 }
