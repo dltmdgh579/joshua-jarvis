@@ -1,10 +1,15 @@
+import { APIResponse } from "./api";
+
 export interface AIRecommendation {
   title: string;
   isAIRecommended: boolean;
 }
 
-export interface AIResponse {
-  success: boolean;
-  data?: AIRecommendation[];
-  error?: any;
+export type AIRecommendationResponse = APIResponse<AIRecommendation[]>;
+
+export interface OpenAIError {
+  message: string;
+  type?: string;
+  code?: string;
+  param?: string;
 }

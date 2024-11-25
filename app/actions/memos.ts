@@ -2,8 +2,10 @@
 
 import { supabase } from "@/lib/supabase";
 import { CreateMemoInput, Memo } from "@/types/memo";
+import { APIResponse } from "@/types/api";
+import { PostgrestError } from "@supabase/supabase-js";
 
-export async function createMemo(data: CreateMemoInput) {
+export async function createMemo(data: CreateMemoInput): Promise<APIResponse<Memo>> {
   try {
     const { data: memo, error } = await supabase
       .from("memos")
@@ -20,24 +22,24 @@ export async function createMemo(data: CreateMemoInput) {
     return {
       success: true,
       data: {
-        ...memo,
+        id: memo.id,
+        eventId: memo.event_id,
+        title: memo.title,
+        content: memo.content,
         createdAt: new Date(memo.created_at),
         updatedAt: new Date(memo.updated_at),
       },
     };
   } catch (error) {
     console.error("Error creating memo:", error);
-    return { success: false, error };
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "메모 생성 중 오류가 발생했습니다.",
+    };
   }
 }
 
-interface MemoResponse {
-  success: boolean;
-  data?: Memo[];
-  error?: any;
-}
-
-export async function getEventMemos(eventId: string): Promise<MemoResponse> {
+export async function getEventMemos(eventId: string): Promise<APIResponse<Memo[]>> {
   try {
     const { data: memos, error } = await supabase
       .from("memos")
@@ -60,11 +62,14 @@ export async function getEventMemos(eventId: string): Promise<MemoResponse> {
     };
   } catch (error) {
     console.error("Error fetching memos:", error);
-    return { success: false, error };
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "메모 조회 중 오류가 발생했습니다.",
+    };
   }
 }
 
-export async function deleteMemo(memoId: string) {
+export async function deleteMemo(memoId: string): Promise<APIResponse<void>> {
   try {
     const { error } = await supabase.from("memos").delete().eq("id", memoId);
 
@@ -73,11 +78,14 @@ export async function deleteMemo(memoId: string) {
     return { success: true };
   } catch (error) {
     console.error("Error deleting memo:", error);
-    return { success: false, error };
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "메모 삭제 중 오류가 발생했습니다.",
+    };
   }
 }
 
-export async function updateMemo(memoId: string, data: { title: string; content: string }) {
+export async function updateMemo(memoId: string, data: { title: string; content: string }): Promise<APIResponse<void>> {
   try {
     const { error } = await supabase
       .from("memos")
@@ -93,6 +101,9 @@ export async function updateMemo(memoId: string, data: { title: string; content:
     return { success: true };
   } catch (error) {
     console.error("Error updating memo:", error);
-    return { success: false, error };
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "메모 수정 중 오류가 발생했습니다.",
+    };
   }
 }
