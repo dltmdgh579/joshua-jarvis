@@ -1,8 +1,12 @@
 "use server";
 
 import { openai, isOpenAIAvailable } from "@/lib/openai";
+import { APIResponse } from "@/types/api";
 
-export async function generateMemoAIContent(content: string, type: "summary" | "suggestions") {
+export async function generateMemoAIContent(
+  content: string,
+  type: "summary" | "suggestions",
+): Promise<APIResponse<string>> {
   if (!isOpenAIAvailable()) {
     return {
       success: false,
@@ -39,7 +43,7 @@ export async function generateMemoAIContent(content: string, type: "summary" | "
 
     return {
       success: true,
-      data: response.choices[0].message.content,
+      data: response.choices[0].message.content || "",
     };
   } catch (error) {
     console.error(`Error generating memo ${type}:`, error);
