@@ -1,12 +1,12 @@
 import OpenAI from "openai";
 
-if (!process.env.OPENAI_API_KEY) {
-  throw new Error("Missing OPENAI_API_KEY environment variable");
-}
-
 export const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY || "dummy-key",
 });
+
+export function isOpenAIAvailable() {
+  return !!process.env.OPENAI_API_KEY;
+}
 
 export async function generateChecklist(
   eventTitle: string,
@@ -37,7 +37,7 @@ export async function generateChecklist(
       ...
     `;
 
-    const response = await openai.chat.completions.create({
+    const response = await openai!.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: [
         {
@@ -63,6 +63,72 @@ export async function generateChecklist(
     return items || [];
   } catch (error) {
     console.error("Error generating checklist:", error);
+    throw error;
+  }
+}
+
+export async function generateMemoSummary(content: string) {
+  try {
+    const prompt = `
+      다음 회의록/메모 내용을 간단히 요약해주세요:
+
+      ${content}
+
+      핵심 내용만 간단명료하게 정리해주세요.
+    `;
+
+    const response = await openai!.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [
+        {
+          role: "system",
+          content: "당신은 회의록과 메모를 요약하는 전문가입니다. 핵심 내용을 간단명료하게 정리해주세요.",
+        },
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+      temperature: 0.7,
+      max_tokens: 500,
+    });
+
+    return response.choices[0].message.content;
+  } catch (error) {
+    console.error("Error generating memo summary:", error);
+    throw error;
+  }
+}
+
+export async function generateMemoSuggestions(content: string) {
+  try {
+    const prompt = `
+      다음 회의록/메모 내용을 바탕으로 개선 아이디어나 추가로 고려해볼 사항을 제안해주세요:
+
+      ${content}
+
+      실용적이고 구체적인 제안을 해주세요.
+    `;
+
+    const response = await openai!.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [
+        {
+          role: "system",
+          content: "당신은 교회 청년부 행사 기획 전문가입니다. 메모 내용을 분석하여 실용적인 제안을 해주세요.",
+        },
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+      temperature: 0.7,
+      max_tokens: 500,
+    });
+
+    return response.choices[0].message.content;
+  } catch (error) {
+    console.error("Error generating memo suggestions:", error);
     throw error;
   }
 }

@@ -2,7 +2,7 @@
 
 import { supabase } from "@/lib/supabase";
 import { Checklist, ChecklistItem } from "@/types/checklist";
-import { generateChecklist } from "@/lib/openai";
+import { generateChecklist } from "./ai";
 
 export async function createChecklist(data: { eventId: string; title: string; dueDate: string }) {
   try {
