@@ -12,3 +12,12 @@ export interface CreateMemoInput {
   title: string;
   content: string;
 }
+
+export interface MemoAIContent {
+  id: string;
+  memoId: string;
+  type: "summary" | "suggestions";
+  content: string;
+  createdAt: Date;
+  updatedAt: Date;
+}

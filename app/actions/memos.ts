@@ -1,7 +1,7 @@
 "use server";
 
 import { supabase } from "@/lib/supabase";
-import { CreateMemoInput, Memo } from "@/types/memo";
+import { CreateMemoInput, Memo, MemoAIContent } from "@/types/memo";
 import { APIResponse } from "@/types/api";
 import { PostgrestError } from "@supabase/supabase-js";
 
@@ -104,6 +104,93 @@ export async function updateMemo(memoId: string, data: { title: string; content:
     return {
       success: false,
       error: error instanceof Error ? error.message : "메모 수정 중 오류가 발생했습니다.",
+    };
+  }
+}
+
+export async function saveMemoAIContent(
+  memoId: string,
+  type: "summary" | "suggestions",
+  content: string,
+): Promise<APIResponse<MemoAIContent>> {
+  try {
+    // 기존 AI 내용이 있는지 확인
+    const { data: existing } = await supabase
+      .from("memo_ai_contents")
+      .select()
+      .eq("memo_id", memoId)
+      .eq("type", type)
+      .single();
+
+    let result;
+    if (existing) {
+      // 업데이트
+      result = await supabase
+        .from("memo_ai_contents")
+        .update({
+          content,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", existing.id)
+        .select()
+        .single();
+    } else {
+      // 새로 생성
+      result = await supabase
+        .from("memo_ai_contents")
+        .insert({
+          memo_id: memoId,
+          type,
+          content,
+        })
+        .select()
+        .single();
+    }
+
+    if (result.error) throw result.error;
+
+    return {
+      success: true,
+      data: {
+        id: result.data.id,
+        memoId: result.data.memo_id,
+        type: result.data.type,
+        content: result.data.content,
+        createdAt: new Date(result.data.created_at),
+        updatedAt: new Date(result.data.updated_at),
+      },
+    };
+  } catch (error) {
+    console.error("Error saving memo AI content:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "AI 내용 저장 중 오류가 발생했습니다.",
+    };
+  }
+}
+
+export async function getMemoAIContents(memoId: string): Promise<APIResponse<MemoAIContent[]>> {
+  try {
+    const { data, error } = await supabase.from("memo_ai_contents").select().eq("memo_id", memoId);
+
+    if (error) throw error;
+
+    return {
+      success: true,
+      data: data.map((item) => ({
+        id: item.id,
+        memoId: item.memo_id,
+        type: item.type,
+        content: item.content,
+        createdAt: new Date(item.created_at),
+        updatedAt: new Date(item.updated_at),
+      })),
+    };
+  } catch (error) {
+    console.error("Error fetching memo AI contents:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "AI 내용 조회 중 오류가 발생했습니다.",
     };
   }
 }

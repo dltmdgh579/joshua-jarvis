@@ -1,14 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { SparklesIcon, Trash2Icon, EditIcon } from "lucide-react";
-import { Memo } from "@/types/memo";
+import { Memo, MemoAIContent } from "@/types/memo";
 import { useToast } from "@/hooks/use-toast";
 import { generateMemoAIContent } from "@/app/actions/ai";
-import { deleteMemo } from "@/app/actions/memos";
+import { deleteMemo, getMemoAIContents, saveMemoAIContent } from "@/app/actions/memos";
 import { EditMemoDialog } from "./EditMemoDialog";
 
 interface MemoDetailDialogProps {
@@ -36,6 +36,24 @@ export function MemoDetailDialog({ memo, open, onOpenChange, onUpdate }: MemoDet
     }).format(date);
   };
 
+  // AI 내용 로드
+  const loadAIContents = async () => {
+    const result = await getMemoAIContents(memo.id);
+    if (result.success && result.data) {
+      const summary = result.data.find((item) => item.type === "summary");
+      const suggestions = result.data.find((item) => item.type === "suggestions");
+      if (summary) setAiSummary(summary.content);
+      if (suggestions) setAiSuggestions(suggestions.content);
+    }
+  };
+
+  // 컴포넌트 마운트 및 메모 변경 시 AI 내용 로드
+  useEffect(() => {
+    if (open && memo.id) {
+      loadAIContents();
+    }
+  }, [open, memo.id]);
+
   const handleGenerateAI = async (type: "summary" | "suggestions") => {
     setIsGenerating(true);
     try {
@@ -44,6 +62,15 @@ export function MemoDetailDialog({ memo, open, onOpenChange, onUpdate }: MemoDet
       if (!result.success) {
         throw new Error(result.error);
       }
+
+      // AI 내용 저장
+      if (result.data) {
+        const saveResult = await saveMemoAIContent(memo.id, type, result.data);
+        if (!saveResult.success) {
+          throw new Error("AI 내용 저장 실패");
+        }
+      }
+
       if (type === "summary") {
         setAiSummary(result.data ?? null);
       } else {
@@ -131,15 +158,15 @@ export function MemoDetailDialog({ memo, open, onOpenChange, onUpdate }: MemoDet
 
               <TabsContent value="summary" className="mt-4">
                 <div className="space-y-4">
+                  <div className="flex justify-end">
+                    <Button onClick={() => handleGenerateAI("summary")} disabled={isGenerating} className="gap-2">
+                      <SparklesIcon className="w-4 h-4" />
+                      {isGenerating ? "요약 생성 중..." : aiSummary ? "다시 요약하기" : "AI로 요약하기"}
+                    </Button>
+                  </div>
                   {!aiSummary ? (
                     <div className="text-center py-8">
-                      <Button onClick={() => handleGenerateAI("summary")} disabled={isGenerating} className="gap-2">
-                        <SparklesIcon className="w-4 h-4" />
-                        {isGenerating ? "요약 생성 중..." : "AI로 요약하기"}
-                      </Button>
-                      <p className="text-sm text-gray-500 mt-2">
-                        AI가 메모 내용을 분석하여 핵심 내용을 요약해드립니다.
-                      </p>
+                      <p className="text-sm text-gray-500">AI가 메모 내용을 분석하여 핵심 내용을 요약해드립니다.</p>
                     </div>
                   ) : (
                     <div className="min-h-[200px] max-h-[60vh] overflow-y-auto text-md p-4 whitespace-pre-wrap rounded-lg bg-gray-50">
@@ -151,15 +178,15 @@ export function MemoDetailDialog({ memo, open, onOpenChange, onUpdate }: MemoDet
 
               <TabsContent value="suggestions" className="mt-4">
                 <div className="space-y-4">
+                  <div className="flex justify-end">
+                    <Button onClick={() => handleGenerateAI("suggestions")} disabled={isGenerating} className="gap-2">
+                      <SparklesIcon className="w-4 h-4" />
+                      {isGenerating ? "제안 생성 중..." : aiSuggestions ? "다시 제안받기" : "AI 제안 받기"}
+                    </Button>
+                  </div>
                   {!aiSuggestions ? (
                     <div className="text-center py-8">
-                      <Button onClick={() => handleGenerateAI("suggestions")} disabled={isGenerating} className="gap-2">
-                        <SparklesIcon className="w-4 h-4" />
-                        {isGenerating ? "제안 생성 중..." : "AI 제안 받기"}
-                      </Button>
-                      <p className="text-sm text-gray-500 mt-2">
-                        AI가 메모 내용을 분석하여 개선 아이디어를 제안해드립니다.
-                      </p>
+                      <p className="text-sm text-gray-500">AI가 메모 내용을 분석하여 개선 아이디어를 제안해드립니다.</p>
                     </div>
                   ) : (
                     <div className="min-h-[200px] max-h-[60vh] overflow-y-auto text-md p-4 whitespace-pre-wrap rounded-lg bg-gray-50">
