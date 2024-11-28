@@ -3,6 +3,8 @@
 import { supabase } from "@/lib/supabase";
 import { openai } from "@/lib/openai";
 import { Game, GameCategory } from "@/types/game";
+import { APIResponse } from "@/types/api";
+import { ProgramType } from "@/types/schedule";
 
 interface GameFilters {
   category: GameCategory;
@@ -74,7 +76,6 @@ export async function getAIGameRecommendations(filters: GameFilters) {
     };
   }
 }
-
 export async function saveGame(game: Omit<Game, "id">) {
   try {
     const { data, error } = await supabase
@@ -127,5 +128,53 @@ export async function getGames() {
   } catch (error) {
     console.error("Error fetching games:", error);
     return { success: false, error };
+  }
+}
+
+export interface ScheduleGame {
+  id: string;
+  name: string;
+  duration: number;
+  type: ProgramType;
+  location?: string;
+  description?: string;
+  created_at: string;
+}
+
+export async function getSavedGames(eventId: string): Promise<APIResponse<ScheduleGame[]>> {
+  try {
+    // event_games 테이블을 통해 이벤트에 저장된 게임 조회
+    const { data, error } = await supabase
+      .from("event_games")
+      .select(
+        `
+        game:games (
+          id,
+          name,
+          duration,
+          location,
+          description,
+          created_at
+        )
+      `,
+      )
+      .eq("event_id", eventId)
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    // 중첩된 game 객체를 풀어서 반환
+    const games = data?.map((item) => item.game).filter(Boolean) || [];
+
+    return {
+      success: true,
+      data: games,
+    };
+  } catch (error) {
+    console.error("Error fetching saved games:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "저장된 게임 목록을 불러오는 중 오류가 발생했습니다.",
+    };
   }
 }

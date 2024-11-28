@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { SparklesIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { SchedulePreview } from "./SchedulePreview";
 import { ScheduleBuilder } from "./ScheduleBuilder";
 import { ProgramLibrary } from "./ProgramLibrary";
+import { GenerateScheduleDialog } from "./GenerateScheduleDialog";
 import { Program, ScheduleBlock } from "@/types/schedule";
 import { saveScheduleBlocks, getScheduleBlocks } from "@/app/actions/schedules";
 import { getEventPrograms } from "@/app/actions/programs";
@@ -19,6 +21,7 @@ export function ScheduleTab({ eventId }: ScheduleTabProps) {
   const [programs, setPrograms] = useState<Program[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isGenerateDialogOpen, setIsGenerateDialogOpen] = useState(false);
   const { toast } = useToast();
 
   // 초기 데이터 로드
@@ -31,14 +34,14 @@ export function ScheduleTab({ eventId }: ScheduleTabProps) {
         if (!programsResult.success) {
           throw new Error(programsResult.error);
         }
-        setPrograms(programsResult.data || []);
+        setPrograms(programsResult.data ?? []);
 
         // 일정표 로드
         const scheduleResult = await getScheduleBlocks(eventId);
         if (!scheduleResult.success) {
           throw new Error(scheduleResult.error);
         }
-        setScheduleBlocks(scheduleResult.data || []);
+        setScheduleBlocks(scheduleResult.data ?? []);
       } catch (error) {
         toast({
           title: "데이터 로드 실패",
@@ -55,7 +58,7 @@ export function ScheduleTab({ eventId }: ScheduleTabProps) {
 
   // 일정표 자동 저장
   useEffect(() => {
-    if (isLoading) return; // 초기 로딩 중에는 저장하지 않음
+    if (isLoading) return;
 
     const saveSchedule = async () => {
       setIsSaving(true);
@@ -75,17 +78,14 @@ export function ScheduleTab({ eventId }: ScheduleTabProps) {
       }
     };
 
-    // 디바운스 처리
     const timeoutId = setTimeout(saveSchedule, 1000);
     return () => clearTimeout(timeoutId);
   }, [scheduleBlocks, eventId, isLoading]);
 
   // 프로그램 업데이트 핸들러
   const handleProgramUpdate = (updatedProgram: Program) => {
-    // 프로그램 목록 업데이트
     setPrograms(programs.map((p) => (p.id === updatedProgram.id ? updatedProgram : p)));
 
-    // 시간표 블록도 업데이트
     setScheduleBlocks(
       scheduleBlocks.map((block) => {
         if (block.id === updatedProgram.id) {
@@ -107,6 +107,14 @@ export function ScheduleTab({ eventId }: ScheduleTabProps) {
 
   return (
     <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold">일정표</h2>
+        <Button onClick={() => setIsGenerateDialogOpen(true)} className="gap-2" disabled={programs.length === 0}>
+          <SparklesIcon className="w-4 h-4" />
+          AI로 일정표 생성
+        </Button>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <SchedulePreview blocks={scheduleBlocks} />
@@ -120,6 +128,7 @@ export function ScheduleTab({ eventId }: ScheduleTabProps) {
           />
         </div>
       </div>
+
       <div>
         <ScheduleBuilder
           blocks={scheduleBlocks}
@@ -128,6 +137,15 @@ export function ScheduleTab({ eventId }: ScheduleTabProps) {
           onProgramUpdate={handleProgramUpdate}
         />
       </div>
+
+      <GenerateScheduleDialog
+        eventId={eventId}
+        programs={programs}
+        currentBlocks={scheduleBlocks}
+        open={isGenerateDialogOpen}
+        onOpenChange={setIsGenerateDialogOpen}
+        onGenerate={setScheduleBlocks}
+      />
     </div>
   );
 }
