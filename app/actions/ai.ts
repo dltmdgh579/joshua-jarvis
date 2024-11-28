@@ -169,7 +169,7 @@ export async function generateSchedule(input: GenerateScheduleInput): Promise<AP
     const schedule = result.schedule || [];
 
     // AI 응답을 ScheduleBlock 형식으로 변환
-    const blocks: ScheduleBlock[] = schedule.map((item: any) => {
+    const blocks: ScheduleBlock[] = schedule.map((item: { programId: string; startTime: string }) => {
       const program = input.programs.find((p) => p.id === item.programId);
       if (!program) throw new Error(`프로그램을 찾을 수 없습니다: ${item.programId}`);
 
