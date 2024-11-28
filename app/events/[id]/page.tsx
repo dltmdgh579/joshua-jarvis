@@ -4,6 +4,7 @@ import { EventHeader } from "@/components/events/EventHeader";
 import { GameTab } from "@/components/events/game/GameTab";
 import { ChecklistTab } from "@/components/events/checklist/ChecklistTab";
 import { MemoTab } from "@/components/events/memo/MemoTab";
+import { ScheduleTab } from "@/components/events/schedule/ScheduleTab";
 
 interface EventPageProps {
   params: {
@@ -36,10 +37,7 @@ export default async function EventPage({ params }: EventPageProps) {
           <ChecklistTab eventId={event.id} />
         </TabsContent>
         <TabsContent value="schedule" className="mt-4">
-          <div className="p-4 border rounded-lg">
-            <h3 className="text-lg font-semibold mb-4">일정표</h3>
-            <p className="text-gray-500">아직 등록된 일정이 없습니다.</p>
-          </div>
+          <ScheduleTab eventId={event.id} />
         </TabsContent>
         <TabsContent value="memo" className="mt-4">
           <MemoTab eventId={event.id} />
