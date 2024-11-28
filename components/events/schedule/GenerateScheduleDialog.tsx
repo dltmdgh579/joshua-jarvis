@@ -52,7 +52,7 @@ export function GenerateScheduleDialog({
         throw new Error(result.error);
       }
 
-      setGeneratedBlocks(result.data);
+      setGeneratedBlocks(result.data ?? []);
       toast({
         title: "일정표 생성 완료",
         description: "생성된 일정표를 확인하고 적용하시겠습니까?",

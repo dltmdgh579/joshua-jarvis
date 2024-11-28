@@ -7,17 +7,18 @@ import { Card } from "@/components/ui/card";
 import { Clock, MapPin } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { convertGameToProgram } from "@/app/actions/ai";
-import { getSavedGames, Game } from "@/app/actions/games";
+import { getSavedGames, ScheduleGame } from "@/app/actions/games";
+import { Program } from "@/types/schedule";
 
 interface GameSelectionDialogProps {
   eventId: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSelect: (program: any) => void;
+  onSelect: (program: Program) => void;
 }
 
 export function GameSelectionDialog({ eventId, open, onOpenChange, onSelect }: GameSelectionDialogProps) {
-  const [games, setGames] = useState<Game[]>([]);
+  const [games, setGames] = useState<ScheduleGame[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isConverting, setIsConverting] = useState(false);
   const { toast } = useToast();
@@ -30,7 +31,7 @@ export function GameSelectionDialog({ eventId, open, onOpenChange, onSelect }: G
         if (!result.success) {
           throw new Error(result.error);
         }
-        setGames(result.data);
+        setGames(result.data ?? []); // null/undefined 체크를 위해 기본값 추가
       } catch (error) {
         toast({
           title: "게임 목록 로드 실패",
@@ -48,12 +49,16 @@ export function GameSelectionDialog({ eventId, open, onOpenChange, onSelect }: G
     }
   }, [open, eventId, toast]);
 
-  const handleSelect = async (game: Game) => {
+  const handleSelect = async (game: ScheduleGame) => {
     setIsConverting(true);
     try {
       const result = await convertGameToProgram(eventId, game.id);
       if (!result.success) {
         throw new Error(result.error);
+      }
+
+      if (!result.data) {
+        throw new Error("변환된 프로그램 데이터가 없습니다");
       }
 
       onSelect(result.data);

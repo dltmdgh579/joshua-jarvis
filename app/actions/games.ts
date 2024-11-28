@@ -135,7 +135,6 @@ export interface ScheduleGame {
   id: string;
   name: string;
   duration: number;
-  type: ProgramType;
   location?: string;
   description?: string;
   created_at: string;
@@ -168,7 +167,7 @@ export async function getSavedGames(eventId: string): Promise<APIResponse<Schedu
 
     return {
       success: true,
-      data: games,
+      data: games as unknown as ScheduleGame[],
     };
   } catch (error) {
     console.error("Error fetching saved games:", error);
